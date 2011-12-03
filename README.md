@@ -6,7 +6,7 @@ This repository contains the demonstration code used during the SpringOne presen
 
 The slide deck can be found [here](http://portal.sliderocket.com/vmware/ImplementingHAArchitecturesWithSpringIntegration).
 
-It comprises of two projects
+It's comprised of two projects
 
 * spring-integration-cluster
 * strict-ordering-test

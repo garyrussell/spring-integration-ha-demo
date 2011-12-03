@@ -1,0 +1,6 @@
+target
+activemq-data
+.svn/
+.classpath
+.project
+.settings

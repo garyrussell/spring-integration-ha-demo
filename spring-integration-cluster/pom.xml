@@ -1,0 +1,427 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.springframework.integration</groupId>
+	<artifactId>spring-integration-cluster</artifactId>
+	<version>1.0.0-BUILD-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>Spring Integration Cluster Support</name>
+
+	<properties>
+		<hibernate.version>3.6.0.Final</hibernate.version>
+		<querydsl.version>2.1.1</querydsl.version>
+		<log4j.version>1.2.14</log4j.version>
+		<org.springframework.version>3.1.0.RC1</org.springframework.version>
+		<org.springframework.batch.version>2.0.3.RELEASE</org.springframework.batch.version>
+		<org.springframework.integration.version>2.1.0.RC1</org.springframework.integration.version>
+		<org.apache.activemq.version>5.4.1</org.apache.activemq.version> 
+		<org.slf4j.version>1.5.8</org.slf4j.version>	 
+		<com.sonic.client.version>8.0</com.sonic.client.version>
+		<org.apache.xmlbeans-version>2.4.0</org.apache.xmlbeans-version>
+		<org.apache.ant.version>1.7.1</org.apache.ant.version> 	
+	</properties>
+
+	<dependencies>
+		
+        <dependency>
+			<groupId>com.springsource.insight</groupId>
+			<artifactId>insight-annotation</artifactId>
+			<version>1.0.0.RELEASE</version>
+			<scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.2.2</version>
+
+        </dependency>
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>1.3</version>
+        </dependency>
+        
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.0.5</version>
+		</dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <version>3.0</version>
+            <scope>test</scope>
+        </dependency>
+        
+         <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.8.5</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+
+ 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${org.springframework.version}</version> 
+		</dependency>
+        
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>	 
+			<version>${org.springframework.version}</version>			
+		</dependency>
+        
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>	 
+			<version>${org.springframework.version}</version>			
+		</dependency>
+		
+        <dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>	 
+			<version>${org.springframework.version}</version>			
+		</dependency>
+        
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>	 
+			<version>${org.springframework.version}</version>			
+		</dependency>
+        
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${org.springframework.version}</version>			
+	    </dependency>
+		
+        <dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+        
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${org.springframework.version}</version>			 
+		</dependency>
+        
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-core</artifactId>	 
+			<version>${org.springframework.integration.version}</version>
+		</dependency>
+        
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-jms</artifactId>	 
+			<version>${org.springframework.integration.version}</version>
+		</dependency>
+        
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-amqp</artifactId>	 
+			<version>${org.springframework.integration.version}</version>
+		</dependency>
+        
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-ip</artifactId>	 
+			<version>${org.springframework.integration.version}</version>
+		</dependency>
+        
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-stream</artifactId> 
+			<version>${org.springframework.integration.version}</version>			
+		</dependency>
+		
+        <dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-jdbc</artifactId>
+			<version>${org.springframework.integration.version}</version>
+		</dependency>
+        
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-jmx</artifactId>	 
+			<version>${org.springframework.integration.version}</version>
+		</dependency>
+        
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-file</artifactId>
+			<version>${org.springframework.integration.version}</version>
+		</dependency>
+		
+        <dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-groovy</artifactId>
+			<version>${org.springframework.integration.version}</version>
+		</dependency>
+		
+        <dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-core</artifactId>
+			<version>${org.apache.activemq.version}</version>
+		</dependency>
+		
+        <dependency>
+			<groupId>org.apache.xbean</groupId>
+			<artifactId>xbean-spring</artifactId>
+			<version>3.7</version>
+		</dependency>
+		
+        <dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.data</groupId>
+		    <artifactId>spring-data-jpa</artifactId>
+		    <version>1.0.0.M2</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.data</groupId>
+		    <artifactId>spring-data-redis</artifactId>
+		    <version>1.0.0.M4</version>
+		</dependency>
+		
+        <dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+		
+        <dependency>
+			<groupId>com.mysema.querydsl</groupId>
+			<artifactId>querydsl-apt</artifactId>
+			<version>${querydsl.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+        <dependency>
+			<groupId>com.mysema.querydsl</groupId>
+			<artifactId>querydsl-jpa</artifactId>
+			<version>${querydsl.version}</version>
+		</dependency>
+		
+        <dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${org.slf4j.version}</version>
+		</dependency>
+		
+        <dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>${org.slf4j.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		
+        <dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${org.slf4j.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		
+        <dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.2.147</version>
+		</dependency>
+	    
+        <dependency>
+			<groupId>com.oracle.jdbc</groupId>
+			<artifactId>com.springsource.oracle.jdbc</artifactId>
+			<version>10.2.0.2</version>
+			<scope>provided</scope>
+	    </dependency>
+
+		<!-- Jackson JSON Mapper -->
+		<dependency>
+		    <groupId>org.codehaus.jackson</groupId>
+		    <artifactId>jackson-core-lgpl</artifactId>
+		    <version>1.6.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.codehaus.jackson</groupId>
+		    <artifactId>jackson-xc</artifactId>
+		    <version>1.6.4</version>
+		</dependency>
+		
+	</dependencies>
+	<build>
+	    <resources>
+	      <resource>
+	        <directory>src/main/java</directory>
+	        <includes>
+	          <include>**/*</include>
+	        </includes>
+	        <excludes>
+	          <exclude>**/*.java</exclude>
+	        </excludes>
+	      </resource>
+	      <resource>
+	        <directory>src/main/resources</directory>
+	        <includes>
+	          <include>**/*</include>
+	        </includes>
+	      </resource>
+	    </resources>
+	    <testResources>
+	      <testResource>
+	        <directory>src/test/java</directory>
+	        <includes>
+	          <include>**/*</include>
+	        </includes>
+	        <excludes>
+	          <exclude>**/*.java</exclude>
+	        </excludes>
+	      </testResource>
+	      <testResource>
+	        <directory>src/test/resources</directory>
+	        <includes>
+	          <include>**/*</include>
+	        </includes>
+	      </testResource>
+	    </testResources>
+	    <plugins>
+	      <plugin>
+	        <artifactId>maven-compiler-plugin</artifactId>
+	        <version>2.3.2</version>
+	        <configuration>
+	          <source>1.5</source>
+	          <target>1.5</target>
+	        </configuration>
+	      </plugin>
+		  <plugin>
+		    <artifactId>maven-surefire-plugin</artifactId>
+		    <version>2.10</version>
+		    <configuration>
+		      <includes>
+		        <include>**/*Tests.java</include>
+		      </includes>
+		      <excludes>
+		        <exclude>**/*Abstract*.java</exclude>
+		      </excludes>
+		    </configuration>
+		  </plugin>
+		  <plugin>
+		  	<artifactId>maven-source-plugin</artifactId>
+		  	<version>2.1.2</version>
+		  	<executions>
+		  		<execution>
+		  			<id>attach-sources</id>
+		  			<goals>
+		  				<goal>jar</goal>
+		  			</goals>
+		  		</execution>
+		  	</executions>
+		  </plugin>
+	 	</plugins>
+	</build>	
+    <repositories>
+    	<repository>
+			<id>maven-central</id>
+			<name>Maven Central</name>
+			<url>http://repo1.maven.org/maven2</url>
+		</repository>
+        <repository>
+            <id>spring-release</id>
+            <name>Spring Portfolio Release Repository</name>
+            <url>http://s3.amazonaws.com/maven.springframework.org/release</url>
+        </repository>
+        <repository>
+            <id>spring-milestone</id>
+            <name>Spring Portfolio Milestone Repository</name>
+            <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+        </repository>
+        <repository>
+            <id>spring-snapshot</id>
+            <name>Spring Portfolio Snapshot Repository</name>
+            <url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
+        </repository>
+		<repository>
+			<id>querydsl</id>
+			<name>QueryDsl</name>
+			<url>http://source.mysema.com/maven2/releases</url>
+		</repository>
+		<repository>
+			<id>jboss</id>
+			<name>JBoss repository</name>
+			<url>https://repository.jboss.org/nexus/content/repositories/releases</url>
+		</repository>
+    </repositories>
+    <profiles>
+		<profile>
+			<id>springOne</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.1</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>java</goal>
+								</goals>
+								<phase>test</phase>
+							</execution>
+						</executions>
+						<configuration>
+							<mainClass>org.springframework.integration.cluster.samples.springone.Main</mainClass>
+							<classpathScope>test</classpathScope>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+    </profiles>
+</project>

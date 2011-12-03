@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
+	xmlns:redis="http://www.springframework.org/schema/redis"
+	xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp-2.1.xsd
+		http://www.springframework.org/schema/redis http://www.springframework.org/schema/redis/spring-redis-1.0.xsd
+		http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit-1.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- inbound adapter -->
+	<int-amqp:inbound-channel-adapter
+		id="sample.inbound.adapter" task-executor="amqp.inbound.exec"
+		channel="sample.inbound" 
+		connection-factory="rabbitConnectionFactory"
+		channel-transacted="true"
+		queue-names="cluster.inboundQ"
+		header-mapper="headerMapper"
+		auto-startup="false" />
+
+	<bean id="headerMapper" class="org.springframework.integration.amqp.support.DefaultAmqpHeaderMapper">
+		<property name="requestHeaderNames" value="sequence" />
+	</bean>
+
+	<!-- Send cluster heartbeats to the inbound queue -->
+	<int-amqp:outbound-channel-adapter 
+		channel="integration.cluster.heartbeat"
+		exchange-name="strict.order.exchange" 
+		routing-key="cluster.inbound"	
+		amqp-template="amqpTemplate" />
+
+	<!-- Send ordering output to an AMQP channel for distribution -->
+	<int-amqp:channel id="strict.ordering.to.worker" task-executor="distribution.exec"
+		connection-factory="rabbitConnectionFactory" concurrent-consumers="5"/>
+
+</beans>

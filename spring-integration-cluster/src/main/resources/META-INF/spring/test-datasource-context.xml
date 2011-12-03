@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<context:property-placeholder properties-ref="integration.cluster.properties"/>
+
+	<util:properties id="integration.cluster.properties">
+		<prop key="integration.cluster.application.id">Test</prop>
+		<prop key="integration.cluster.single.source">True</prop>
+		<prop key="integration.cluster.instance.id">Test</prop>
+		<prop key="integration.cluster.inbound.adapter">sample.inbound.adapter</prop>
+		<prop key="integration.cluster.keepalive.interval">5000</prop>
+		<prop key="integration.cluster.monitor.interval">10000</prop>
+		<prop key="integration.cluster.file.dir">/tmp/gatekeeper</prop>
+		<prop key="integration.strict.ordering.dispatcher">Dispatcher1</prop>
+		<prop key="integration.strict.ordering.process">Process1</prop>
+		<prop key="integration.cluster.db.url">jdbc:oracle:thin:@legolas:1521:XE</prop>
+		<prop key="integration.cluster.db.driver">oracle.jdbc.OracleDriver</prop>
+		<prop key="integration.cluster.db.username">sa</prop>
+		<prop key="integration.cluster.db.password">sa</prop>		
+	</util:properties>
+
+	<beans profile="jdbc">
+<!-- 		<jdbc:embedded-database id="cluster.dataSource" type="H2"> -->
+<!-- 			<jdbc:script location="classpath:/tables.sql"/> -->
+<!-- 			<jdbc:script location="classpath:/strict-ordering-tables.sql"/>		 -->
+<!-- 			<jdbc:script location="classpath:/jdbc-polling-sample-tables.sql"/> -->
+<!-- 			<jdbc:script location="classpath:/jdbc-polling-sample-data.sql"/> -->
+<!-- 			<jdbc:script location="classpath:/h2-triggers.sql"/> -->
+<!-- 		</jdbc:embedded-database> -->
+		<bean id="cluster.dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+			<property name="url" value="${integration.cluster.db.url}"/>
+			<property name="driverClassName" value="${integration.cluster.db.driver}"/>
+			<property name="username" value="${integration.cluster.db.username}"/>
+			<property name="password" value="${integration.cluster.db.password}"/>
+			<property name="maxActive" value="10"/>
+			<property name="validationQuery" value="SELECT 1 FROM DUAL"/>
+			<property name="testWhileIdle" value="false"/>
+		</bean>
+	
+		<bean id="cluster.jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+			<property name="dataSource" ref="cluster.dataSource"/>
+		</bean>
+		
+		<tx:annotation-driven/>
+
+	</beans>
+	
+	<beans profile="jdbc">
+		<bean id="entityQueues" class="org.springframework.integration.cluster.strictorder.JdbcEntityQueues">
+			<constructor-arg ref="cluster.jdbcTemplate"/>
+			<constructor-arg value="dispatcher"/>
+		</bean>
+	</beans>	
+
+	<beans profile="amqp">
+		<bean id="entityQueues" class="org.springframework.integration.cluster.strictorder.RabbitEntityQueues" />
+	</beans>	
+
+</beans>

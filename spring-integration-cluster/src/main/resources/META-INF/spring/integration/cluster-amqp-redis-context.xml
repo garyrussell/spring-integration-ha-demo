@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp-2.1.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.1.xsd
+		http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit-1.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="integration.cluster.status.repository" class="org.springframework.integration.cluster.redis.ClusterStatusRepositoryImpl">
+		<constructor-arg ref="lock.redisTemplate" />
+		<constructor-arg ref="status.redisTemplate" />
+		<constructor-arg value="${VCAP_APP_HOST:localhost}:${VCAP_APP_PORT:1234}"/>
+	</bean>
+		
+	<bean id="lock.redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+		<property name="connectionFactory" ref="redisConnectionFactory" />
+	</bean>
+		
+	<bean id="status.redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+		<property name="connectionFactory" ref="redisConnectionFactory" />
+	</bean>
+		
+	<bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" />
+	
+	<rabbit:connection-factory id="rabbitConnectionFactory" />
+
+    <rabbit:template id="amqpTemplate" 
+    	connection-factory="rabbitConnectionFactory"
+    	exchange="strict.order.exchange" />
+
+    <rabbit:admin connection-factory="rabbitConnectionFactory" />
+
+	<rabbit:queue name="cluster.inboundQ" />
+	
+    <rabbit:queue name="strict.order.workQ" />
+
+    <rabbit:direct-exchange name="strict.order.exchange">
+        <rabbit:bindings>
+            <rabbit:binding queue="strict.order.workQ" key="strict.order.work" />
+        	<rabbit:binding queue="cluster.inboundQ" key="cluster.inbound" />
+        </rabbit:bindings>
+    </rabbit:direct-exchange>
+
+	<!-- Entity Queues and Lock for Strict Ordering -->
+	<bean id="entityQueues" class="org.springframework.integration.cluster.strictorder.RabbitEntityQueues" />
+	
+	<bean id="entityLock" class="org.springframework.integration.cluster.strictorder.redis.RedisEntityLock">
+		<constructor-arg ref="lock.redisTemplate" />
+		<constructor-arg value="${integration.strict.ordering.dispatcher}" />
+		<constructor-arg value="${integration.strict.ordering.process}" />
+	</bean>
+
+	<int-amqp:channel id="strict.ordering.unlock.transformed" 
+		task-executor="unlock.exec"/>
+
+	<task:executor id="unlock.exec" pool-size="1"/>
+	
+</beans>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.1.xsd
+		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+
+	<tx:annotation-driven/>
+		
+	<bean id="cluster.dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="url" value="${integration.cluster.db.url}"/>
+		<property name="driverClassName" value="${integration.cluster.db.driver}"/>
+		<property name="username" value="${integration.cluster.db.username}"/>
+		<property name="password" value="${integration.cluster.db.password}"/>
+		<property name="maxActive" value="10"/>
+		<property name="validationQuery" value="${integration.cluster.db.validation.query}"/>
+		<property name="testWhileIdle" value="false"/>
+		<property name="testOnBorrow" value="true"/>
+	</bean>
+
+	<bean id="cluster.jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="cluster.dataSource"/>
+	</bean>
+	
+	<bean id="integration.cluster.status.repository" class="org.springframework.integration.cluster.jdbc.ClusterStatusRepositoryImpl">
+		<constructor-arg ref="cluster.jdbcTemplate" />
+	</bean>
+
+	<import resource="jpa/strict-order-context.xml" />
+	
+<!-- JMS -->
+
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="defaultDestination" ref="cluster.in.queue" />
+	</bean>
+
+	<bean id="jmsTransactionManager"
+		class="org.springframework.jms.connection.JmsTransactionManager">
+		<property name="connectionFactory" ref="connectionFactory" />
+	</bean>
+
+	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL" value="tcp://localhost:61616"/>
+	</bean>
+
+	<bean id="cluster.in.queue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="cluster.inboundQ"/>
+	</bean>
+
+	<bean id="strict.order.unlock.queue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="strict.order.unlockQ"/>
+	</bean>
+
+	<int-jms:channel id="strict.ordering.unlock" 
+		concurrency="1"
+		connection-factory="connectionFactory" 
+		queue="strict.order.unlock.queue"
+		task-executor="unlock.exec"/>
+
+	<task:executor id="unlock.exec" pool-size="1"/>
+	
+	<beans profile="mysql">
+		<bean id="entityQueues" class="org.springframework.integration.cluster.strictorder.JdbcEntityQueues">
+			<constructor-arg ref="cluster.jdbcTemplate"/>
+			<constructor-arg value="${integration.strict.ordering.dispatcher}"/>
+		</bean>
+	</beans>
+
+	<beans profile="oracle">
+		<bean id="entityQueues" class="org.springframework.integration.cluster.strictorder.JdbcEntityQueuesOracle">
+			<constructor-arg ref="cluster.jdbcTemplate"/>
+			<constructor-arg value="${integration.strict.ordering.dispatcher}"/>
+		</bean>
+	</beans>
+
+</beans>

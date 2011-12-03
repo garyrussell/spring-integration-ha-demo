@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-jmx="http://www.springframework.org/schema/integration/jmx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+		http://www.springframework.org/schema/integration/jmx http://www.springframework.org/schema/integration/jmx/spring-integration-jmx.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<int:channel id="integration.cluster.inbound" />
+
+	<int:channel id="integration.cluster.outbound" />
+	
+	<int:channel id="integration.cluster.control" />
+	
+	<!-- CONTROL BUS -->	
+	<int:gateway id="integration.cluster.control.gateway" 
+		service-interface="org.springframework.integration.cluster.ControlBusGateway"
+		default-request-channel="integration.cluster.control"/>
+
+	<int:control-bus input-channel="integration.cluster.control"/>
+		
+	<!-- Heartbeat -->	
+	<int:gateway id="integration.cluster.heartbeat.gateway" 
+		service-interface="org.springframework.integration.cluster.HeartbeatGateway"
+		default-request-channel="integration.cluster.heartbeat"/>
+	
+	<int:channel id="integration.cluster.heartbeat">
+		<int:dispatcher task-executor="integration.cluster.heartbeat.sender.executor"/>
+	</int:channel>
+	
+	<task:executor id="integration.cluster.heartbeat.sender.executor" pool-size="1"/>
+	
+	<!-- Gatekeeper -->
+	<int:service-activator id="integration.cluster.gatekeeper"
+		input-channel="integration.cluster.inbound"
+		output-channel="integration.cluster.outbound">
+		<bean class="org.springframework.integration.cluster.GateKeeperImpl">
+			<constructor-arg ref="integration.cluster.controller"/>
+		</bean>
+	</int:service-activator>	
+		
+	<bean id="integration.cluster.controller" class="org.springframework.integration.cluster.ClusterControlImpl">
+		<constructor-arg value="${integration.cluster.application.id}"/>
+		<constructor-arg value="${integration.cluster.single.source}"/>
+		<constructor-arg value="${VCAP_APP_HOST:localhost}:${VCAP_APP_PORT:1234}"/>
+		<constructor-arg value="${integration.cluster.inbound.adapter}"/>
+		<constructor-arg value="${integration.cluster.monitor.interval}"/>
+		<constructor-arg value="${integration.cluster.keepalive.interval}"/>
+		<constructor-arg ref="integration.cluster.control.gateway" />
+		<constructor-arg ref="integration.cluster.heartbeat.gateway" />
+		<constructor-arg ref="integration.cluster.status.repository"/>
+	</bean>
+		
+	<bean id="integration.cluster.control.mbean" class="org.springframework.integration.cluster.ClusterManagementMBean">
+		<constructor-arg ref="integration.cluster.controller"/>
+	</bean>
+		
+	<task:scheduler id="integration.cluster.heartbeat.scheduler" pool-size="1"/>
+	
+	<task:scheduled-tasks scheduler="integration.cluster.heartbeat.scheduler">
+		<task:scheduled ref="integration.cluster.controller" method="doMonitor" fixed-rate="${integration.cluster.monitor.interval}"/>
+	</task:scheduled-tasks>
+
+	<beans profile="amqp-redis">
+		<import resource="cluster-amqp-redis-context.xml" />
+	</beans>
+
+	<beans profile="jms-jdbc">
+		<import resource="cluster-jms-jdbc-context.xml" />
+	</beans>
+	
+</beans>

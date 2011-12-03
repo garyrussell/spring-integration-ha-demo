@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beansProjectDescription>
+	<version>1</version>
+	<pluginVersion><![CDATA[2.7.2.201109122348-RELEASE]]></pluginVersion>
+	<configSuffixes>
+		<configSuffix><![CDATA[xml]]></configSuffix>
+	</configSuffixes>
+	<enableImports><![CDATA[false]]></enableImports>
+	<configs>
+		<config>src/test/resources/META-INF/spring/integration/cluster/mock-cluster-context.xml</config>
+		<config>src/test/java/org/springframework/integration/cluster/ClusterStatusRedisRepositoryTests-context.xml</config>
+		<config>src/test/java/org/springframework/integration/cluster/RabbitEntityQueuesTests-context.xml</config>
+		<config>src/main/resources/META-INF/spring/integration/sample-amqp-redis-context.xml</config>
+		<config>src/main/resources/META-INF/spring/integration/cluster-amqp-redis-context.xml</config>
+		<config>src/main/resources/META-INF/spring/integration/cluster-jms-jdbc-context.xml</config>
+		<config>src/main/resources/META-INF/spring/integration/sample-jms-jdbc-context.xml</config>
+	</configs>
+	<configSets>
+	</configSets>
+</beansProjectDescription>

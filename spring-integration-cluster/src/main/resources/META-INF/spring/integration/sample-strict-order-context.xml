@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:int-groovy="http://www.springframework.org/schema/integration/groovy"
+	xmlns:int-jmx="http://www.springframework.org/schema/integration/jmx"
+	xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
+	xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp-2.1.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.1.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.1.xsd
+		http://www.springframework.org/schema/integration/jmx http://www.springframework.org/schema/integration/jmx/spring-integration-jmx-2.1.xsd
+		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.1.xsd
+		http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream-2.1.xsd
+		http://www.springframework.org/schema/integration/groovy http://www.springframework.org/schema/integration/groovy/spring-integration-groovy-2.1.xsd
+		http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit-1.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<context:property-placeholder properties-ref="integration.cluster.properties"/>
+	
+	<context:annotation-config/>
+
+	<context:mbean-server/>
+
+	<context:mbean-export/>	
+	
+	<int-jmx:mbean-export default-domain="spring.application" object-name-static-properties="objectNameComponentMap"/>
+
+	<util:properties id="objectNameComponentMap">
+		<prop key="application">${integration.cluster.application.id}</prop>
+	</util:properties>
+
+	<import resource="cluster-control-context.xml"/>
+
+	<import resource="strict-order-core-context.xml"/>
+
+	<int:channel id="sample.inbound" />
+	
+	<!-- Bridge our inbound adapter to cluster control -->
+	<int:bridge id="inbound.to.cluster.bridge" 
+		input-channel="sample.inbound" 
+		output-channel="integration.cluster.inbound"/>
+
+	<!-- Bridge cluster control output to strict ordering -->
+	<!-- S.O. skipped if running with 'cluster' profile - see <beans/> below -->
+	<int:bridge id="cluster.to.strict.ordering.bridge"
+		input-channel="integration.cluster.outbound"
+		output-channel="strict.ordering.inbound"/>
+
+	<!-- Bridge strict ordering output to a distribution channel -->
+	<int:bridge id="strict.ordering.to.worker.bridge" 
+		input-channel="strict.ordering.outbound"
+		output-channel="strict.ordering.to.tracker"
+		/>
+
+	<!--  -->
+    <int:service-activator 
+    	input-channel="strict.ordering.to.tracker" 
+    	output-channel="strict.ordering.to.worker"
+    	ref="messageTracker" 
+    	method="trackOutbound"/>
+
+	<int:chain id="sample.worker.chain" 
+		input-channel="strict.ordering.to.worker" output-channel="worker.outbound">
+		<int:service-activator >
+			<int-groovy:script><![CDATA[
+			    Thread.sleep(new Random().nextInt(3000))
+				payload
+		 ]]></int-groovy:script>
+		</int:service-activator>
+		<int:service-activator >
+			<int-groovy:script><![CDATA[
+				println('OUT:' + payload + ":" + headers.sequence)
+				payload
+		 ]]></int-groovy:script>
+		</int:service-activator>
+	</int:chain>
+	
+	<int:publish-subscribe-channel id="worker.outbound"/>
+
+	<int-stream:stdout-channel-adapter channel="worker.outbound" append-newline="true"/>
+
+	<int:bridge input-channel="worker.outbound" output-channel="test.output"/>
+	
+	<int:channel id="test.output">
+		<int:queue/>
+	</int:channel>
+		
+	<task:executor id="worker.task.executor" pool-size="10"/>
+
+	<bean id="entityKeyExtractor"
+		class="org.springframework.integration.cluster.strictorder.entitykey.SpelEntityKeyExtractor">
+		<property name="payloadExpression" value="payload" />
+	</bean>
+
+	<task:executor id="distribution.exec" pool-size="10"/>
+	
+	<task:executor id="amqp.inbound.exec" pool-size="10"/>
+		
+	<!-- Unlock the entity after processing -->
+	<int:bridge id="unlock.bridge" 
+		input-channel="worker.outbound" 
+		output-channel="strict.ordering.unlock"/>
+		
+	<!-- Enable this profile to override the bridge and skip S.O. -->
+	<beans profile="cluster">
+		<!-- Bridge cluster control output to stdout - override bridge -->
+		<int:bridge id="cluster.to.strict.ordering.bridge"
+			input-channel="integration.cluster.outbound"
+			output-channel="stdout"/>
+		<int-stream:stdout-channel-adapter id="stdout" append-newline="true"/>
+	</beans>		
+
+	<beans profile="amqp-redis">
+
+		<import resource="sample-amqp-redis-context.xml"/>		
+	
+		<util:properties id="integration.cluster.properties">
+			<prop key="integration.cluster.application.id">Test</prop>
+			<prop key="integration.cluster.single.source">True</prop>
+			<prop key="integration.cluster.instance.id">Test</prop>
+			<prop key="integration.cluster.inbound.adapter">sample.inbound.adapter</prop>
+			<prop key="integration.cluster.keepalive.interval">5000</prop>
+			<prop key="integration.cluster.monitor.interval">10000</prop>
+			<prop key="integration.strict.ordering.dispatcher">Dispatcher1</prop>
+			<prop key="integration.strict.ordering.process">Process1</prop>
+		</util:properties>
+		
+	</beans>
+	
+	<beans profile="jms-jdbc">
+	
+		<import resource="sample-jms-jdbc-context.xml"/>
+		
+	</beans>
+
+	<beans profile="mysql">
+	
+		<util:properties id="integration.cluster.properties">
+			<prop key="integration.cluster.application.id">Test</prop>
+			<prop key="integration.cluster.single.source">True</prop>
+			<prop key="integration.cluster.instance.id">Test</prop>
+			<prop key="integration.cluster.inbound.adapter">sample.inbound.adapter</prop>
+			<prop key="integration.cluster.keepalive.interval">5000</prop>
+			<prop key="integration.cluster.monitor.interval">10000</prop>
+			<prop key="integration.cluster.file.dir">/tmp/gatekeeper</prop>
+			<prop key="integration.strict.ordering.dispatcher">Dispatcher1</prop>
+			<prop key="integration.strict.ordering.process">Process1</prop>
+			<prop key="integration.cluster.db.url">jdbc:mysql://legolas:3306/test</prop>
+			<prop key="integration.cluster.db.driver">com.mysql.jdbc.Driver</prop>
+			<prop key="integration.cluster.db.username">sa</prop>
+			<prop key="integration.cluster.db.password">sa</prop>	
+			<prop key="integration.cluster.db.validation.query">SELECT 1</prop>	
+		</util:properties>
+		
+	</beans>
+
+	<beans profile="oracle">
+	
+		<util:properties id="integration.cluster.properties">
+			<prop key="integration.cluster.application.id">Test</prop>
+			<prop key="integration.cluster.single.source">True</prop>
+			<prop key="integration.cluster.instance.id">Test</prop>
+			<prop key="integration.cluster.inbound.adapter">sample.inbound.adapter</prop>
+			<prop key="integration.cluster.keepalive.interval">5000</prop>
+			<prop key="integration.cluster.monitor.interval">10000</prop>
+			<prop key="integration.cluster.file.dir">/tmp/gatekeeper</prop>
+			<prop key="integration.strict.ordering.dispatcher">Dispatcher1</prop>
+			<prop key="integration.strict.ordering.process">Process1</prop>
+			<prop key="integration.cluster.db.url">jdbc:oracle:thin:@legolas:1521:XE</prop>
+			<prop key="integration.cluster.db.driver">oracle.jdbc.OracleDriver</prop>
+			<prop key="integration.cluster.db.username">sa</prop>
+			<prop key="integration.cluster.db.password">sa</prop>	
+			<prop key="integration.cluster.db.validation.query">SELECT 1 FROM DUAL</prop>	
+		</util:properties>
+		
+	</beans>
+	
+</beans>

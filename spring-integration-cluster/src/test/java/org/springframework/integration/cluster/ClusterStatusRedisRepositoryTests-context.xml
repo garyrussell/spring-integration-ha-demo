@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="integration.cluster.status.repository" class="org.springframework.integration.cluster.redis.ClusterStatusRepositoryImpl">
+		<constructor-arg ref="lock.redisTemplate" />
+		<constructor-arg ref="status.redisTemplate" />
+		<constructor-arg value="TestInstance" />
+	</bean>
+	
+	<bean id="lock.redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+		<property name="connectionFactory" ref="redisConnectionFactory" />
+	</bean>
+	
+	<bean id="status.redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+		<property name="connectionFactory" ref="redisConnectionFactory" />
+	</bean>
+	
+	<bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" />
+
+</beans>

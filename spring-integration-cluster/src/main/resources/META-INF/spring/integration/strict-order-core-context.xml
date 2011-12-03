@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp-2.1.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+		http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream-2.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<int:channel id="strict.ordering.inbound"/>
+	
+	<int:channel id="strict.ordering.tx.inbound"/>
+	
+	<int:channel id="strict.ordering.outbound"/>
+	
+	<bean id="messageTracker"
+		class="org.springframework.integration.cluster.samples.springone.MessageTracker"/>
+
+    <int:service-activator 
+    	input-channel="strict.ordering.inbound" 
+    	output-channel="to.strict.ordering.dispatcher"
+    	ref="messageTracker" 
+    	method="trackInbound"/>
+
+	<int:service-activator id="strict.ordering.dispatcher" 
+		input-channel="to.strict.ordering.dispatcher" 
+		output-channel="strict.ordering.outbound" 
+		ref="dispatcher" method="dispatch"/>
+		
+	<bean id="dispatcher"
+		class="org.springframework.integration.cluster.strictorder.Dispatcher">
+		<constructor-arg ref="entityLock"/>
+		<property name="entityKeyExtractor" ref="entityKeyExtractor"/>
+		<property name="entityQueues" ref="entityQueues"/>
+	</bean>	
+	
+	<int:channel id="strict.ordering.release" />
+
+	<!-- can be used for batching released locks -->
+	<int:chain input-channel="strict.ordering.release"
+			output-channel="to.strict.ordering.dispatcher">
+		<int:splitter expression="payload"/>
+		<int:service-activator method="processQueue" ref="dispatcher"/>
+	</int:chain>	
+	
+	<int:transformer input-channel="strict.ordering.unlock"
+		 output-channel="strict.ordering.release"
+		 expression="headers['strict.order.lock']"/>	
+
+</beans>

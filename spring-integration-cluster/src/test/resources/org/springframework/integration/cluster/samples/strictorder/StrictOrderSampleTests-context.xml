@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<import resource="classpath:/META-INF/spring/integration/sample-strict-order-context.xml" />
+
+	<context:property-placeholder properties-ref="integration.cluster.properties"/>
+
+	<util:properties id="integration.cluster.properties">
+		<prop key="integration.cluster.application.id">Test</prop>
+		<prop key="integration.cluster.single.source">True</prop>
+		<prop key="integration.cluster.instance.id">Test</prop>
+		<prop key="integration.cluster.inbound.adapter">sample.inbound.adapter</prop>
+		<prop key="integration.cluster.keepalive.interval">5000</prop>
+		<prop key="integration.cluster.monitor.interval">10000</prop>
+		<prop key="integration.cluster.file.dir">/tmp/gatekeeper</prop>
+		<prop key="integration.strict.ordering.dispatcher">Dispatcher1</prop>
+		<prop key="integration.strict.ordering.process">Process1</prop>
+		<prop key="integration.cluster.db.url">jdbc:oracle:thin:@legolas:1521:XE</prop>
+		<prop key="integration.cluster.db.driver">oracle.jdbc.OracleDriver</prop>
+		<prop key="integration.cluster.db.username">sa</prop>
+		<prop key="integration.cluster.db.password">sa</prop>		
+	</util:properties>
+
+</beans>

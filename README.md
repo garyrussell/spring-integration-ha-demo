@@ -85,6 +85,8 @@ Supported profiles are
 
 (each with, or without 'cluster').
 
+The JMS version is currently configured for ActiveMQ, a convenience class AMQ.java is provided to start a broker.
+
 After a short while, you should see both instances emit information as to which one has been elected as the master. You should
 see periodic heartbeats because no real data is being processed.
 

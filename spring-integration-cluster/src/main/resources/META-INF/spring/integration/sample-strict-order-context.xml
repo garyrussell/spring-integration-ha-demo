@@ -54,13 +54,6 @@
 		input-channel="integration.cluster.outbound"
 		output-channel="strict.ordering.inbound"/>
 
-	<!-- Bridge strict ordering output to a distribution channel -->
-	<int:bridge id="strict.ordering.to.worker.bridge" 
-		input-channel="strict.ordering.outbound"
-		output-channel="strict.ordering.to.tracker"
-		/>
-
-	<!--  -->
     <int:service-activator 
     	input-channel="strict.ordering.to.tracker" 
     	output-channel="strict.ordering.to.worker"

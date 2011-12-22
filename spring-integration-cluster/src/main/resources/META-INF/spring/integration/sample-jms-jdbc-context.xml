@@ -12,6 +12,7 @@
 		channel="integration.cluster.inbound" 
 		connection-factory="connectionFactory"
 		transaction-manager="jmsTransactionManager"
+		cache-level="#{ T(org.springframework.jms.listener.DefaultMessageListenerContainer).CACHE_CONSUMER }"
 		auto-startup="false" 
 		destination="cluster.in.queue" />
 
@@ -20,15 +21,21 @@
 		destination="cluster.in.queue"
 		jms-template="jmsTemplate" />
 
-	<int-jms:channel id="strict.ordering.to.worker" 
+	<!-- Strict ordering outbound messages distributed to workers -->
+	<int-jms:outbound-channel-adapter id="work.distribution.out"
+		channel="strict.ordering.outbound"
+		connection-factory="connectionFactory"
+		destination-name="strict.order.workQ"
+		extract-payload="false" />
+
+	<int-jms:message-driven-channel-adapter id="work.distribution.in"
+		channel="strict.ordering.to.tracker"
 		connection-factory="connectionFactory"
 		transaction-manager="jmsTransactionManager"
-		queue-name="strict.order.workQ"
-		concurrency="5"
-		task-executor="worker.exec"/>
+		cache-level="#{ T(org.springframework.jms.listener.DefaultMessageListenerContainer).CACHE_CONSUMER }"
+		destination="strict.order.work.queue"
+		max-concurrent-consumers="5" />
 		
-	<task:executor id="worker.exec" pool-size="5"/>
-
 	<bean id="strict.order.work.queue" class="org.apache.activemq.command.ActiveMQQueue">
 		<constructor-arg value="strict.order.workQ"/>
 	</bean>

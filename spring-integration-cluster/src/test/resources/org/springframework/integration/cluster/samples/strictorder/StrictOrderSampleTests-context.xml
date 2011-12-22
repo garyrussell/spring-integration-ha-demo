@@ -3,13 +3,21 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
 	<import resource="classpath:/META-INF/spring/integration/sample-strict-order-context.xml" />
 
 	<context:property-placeholder properties-ref="integration.cluster.properties"/>
+
+	<!-- Bridge strict ordering output to the distribution channel -->
+	<int:bridge id="strict.ordering.to.worker.bridge"
+		input-channel="strict.ordering.outbound"
+		output-channel="strict.ordering.to.tracker"
+		/>
 
 	<util:properties id="integration.cluster.properties">
 		<prop key="integration.cluster.application.id">Test</prop>

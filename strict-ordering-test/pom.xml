@@ -60,12 +60,6 @@
 			<artifactId>aspectjrt</artifactId>
 			<version>${org.aspectj-version}</version>
 		</dependency>	
-		<dependency>
-			<groupId>com.sonic.client</groupId>
-			<artifactId>sonic_Client</artifactId>
-			<version>8.0</version>
-		</dependency>
-		
 		
 		<!-- Logging -->
 		<dependency>

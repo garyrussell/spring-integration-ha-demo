@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.integration</groupId>
 	<artifactId>spring-integration-cluster</artifactId>
@@ -15,22 +15,24 @@
 		<org.springframework.version>3.1.0.RELEASE</org.springframework.version>
 		<org.springframework.batch.version>2.0.3.RELEASE</org.springframework.batch.version>
 		<org.springframework.integration.version>2.1.0.RC1</org.springframework.integration.version>
-		<org.apache.activemq.version>5.4.1</org.apache.activemq.version> 
-		<org.slf4j.version>1.5.8</org.slf4j.version>	 
+		<org.apache.activemq.version>5.4.1</org.apache.activemq.version>
+		<org.slf4j.version>1.5.8</org.slf4j.version>
 		<com.sonic.client.version>8.0</com.sonic.client.version>
 		<org.apache.xmlbeans-version>2.4.0</org.apache.xmlbeans-version>
-		<org.apache.ant.version>1.7.1</org.apache.ant.version> 	
+		<org.apache.ant.version>1.7.1</org.apache.ant.version>
+		<spring.data.jpa.version>1.11.22.RELEASE</spring.data.jpa.version>
+		<spring.data.redis.version>1.8.22.RELEASE</spring.data.redis.version>
 	</properties>
 
 	<dependencies>
-		
+
         <dependency>
 			<groupId>com.springsource.insight</groupId>
 			<artifactId>insight-annotation</artifactId>
 			<version>1.0.0.RELEASE</version>
 			<scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
@@ -64,7 +66,7 @@
             <artifactId>commons-pool</artifactId>
             <version>1.3</version>
         </dependency>
-        
+
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -84,14 +86,14 @@
             <version>3.0</version>
             <scope>test</scope>
         </dependency>
-        
+
          <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.8.5</version>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
@@ -102,180 +104,180 @@
  		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<version>${org.springframework.version}</version> 
+			<version>${org.springframework.version}</version>
 		</dependency>
-        
+
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>	 
-			<version>${org.springframework.version}</version>			
+			<artifactId>spring-context</artifactId>
+			<version>${org.springframework.version}</version>
 		</dependency>
-        
+
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>	 
-			<version>${org.springframework.version}</version>			
+			<artifactId>spring-beans</artifactId>
+			<version>${org.springframework.version}</version>
 		</dependency>
-		
+
         <dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-jms</artifactId>	 
-			<version>${org.springframework.version}</version>			
+			<artifactId>spring-jms</artifactId>
+			<version>${org.springframework.version}</version>
 		</dependency>
-        
+
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>	 
-			<version>${org.springframework.version}</version>			
+			<artifactId>spring-jdbc</artifactId>
+			<version>${org.springframework.version}</version>
 		</dependency>
-        
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-			<version>${org.springframework.version}</version>			
+			<version>${org.springframework.version}</version>
 	    </dependency>
-		
+
         <dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
 			<version>${org.springframework.version}</version>
 		</dependency>
-        
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-orm</artifactId>
-			<version>${org.springframework.version}</version>			 
+			<version>${org.springframework.version}</version>
 		</dependency>
-        
+
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
-			<artifactId>spring-integration-core</artifactId>	 
+			<artifactId>spring-integration-core</artifactId>
 			<version>${org.springframework.integration.version}</version>
 		</dependency>
-        
+
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
-			<artifactId>spring-integration-jms</artifactId>	 
+			<artifactId>spring-integration-jms</artifactId>
 			<version>${org.springframework.integration.version}</version>
 		</dependency>
-        
+
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
-			<artifactId>spring-integration-amqp</artifactId>	 
+			<artifactId>spring-integration-amqp</artifactId>
 			<version>${org.springframework.integration.version}</version>
 		</dependency>
-        
+
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
-			<artifactId>spring-integration-ip</artifactId>	 
+			<artifactId>spring-integration-ip</artifactId>
 			<version>${org.springframework.integration.version}</version>
 		</dependency>
-        
+
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
-			<artifactId>spring-integration-stream</artifactId> 
-			<version>${org.springframework.integration.version}</version>			
+			<artifactId>spring-integration-stream</artifactId>
+			<version>${org.springframework.integration.version}</version>
 		</dependency>
-		
+
         <dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-jdbc</artifactId>
 			<version>${org.springframework.integration.version}</version>
 		</dependency>
-        
+
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
-			<artifactId>spring-integration-jmx</artifactId>	 
+			<artifactId>spring-integration-jmx</artifactId>
 			<version>${org.springframework.integration.version}</version>
 		</dependency>
-        
+
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-file</artifactId>
 			<version>${org.springframework.integration.version}</version>
 		</dependency>
-		
+
         <dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-groovy</artifactId>
 			<version>${org.springframework.integration.version}</version>
 		</dependency>
-		
+
         <dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-core</artifactId>
 			<version>${org.apache.activemq.version}</version>
 		</dependency>
-		
+
         <dependency>
 			<groupId>org.apache.xbean</groupId>
 			<artifactId>xbean-spring</artifactId>
 			<version>3.7</version>
 		</dependency>
-		
+
         <dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>${log4j.version}</version>
 		</dependency>
-		
+
 		<dependency>
 		    <groupId>org.springframework.data</groupId>
 		    <artifactId>spring-data-jpa</artifactId>
-		    <version>1.0.0.M2</version>
+		    <version>${spring.data.jpa.version}</version>
 		</dependency>
-		
+
 		<dependency>
 		    <groupId>org.springframework.data</groupId>
 		    <artifactId>spring-data-redis</artifactId>
-		    <version>1.0.0.M4</version>
+		    <version>${spring.data.redis.version}</version>
 		</dependency>
-		
+
         <dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>${hibernate.version}</version>
 		</dependency>
-		
+
         <dependency>
 			<groupId>com.mysema.querydsl</groupId>
 			<artifactId>querydsl-apt</artifactId>
 			<version>${querydsl.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
         <dependency>
 			<groupId>com.mysema.querydsl</groupId>
 			<artifactId>querydsl-jpa</artifactId>
 			<version>${querydsl.version}</version>
 		</dependency>
-		
+
         <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>${org.slf4j.version}</version>
 		</dependency>
-		
+
         <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
 			<version>${org.slf4j.version}</version>
 			<scope>runtime</scope>
 		</dependency>
-		
+
         <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>${org.slf4j.version}</version>
 			<scope>runtime</scope>
 		</dependency>
-		
+
         <dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<version>1.2.147</version>
 		</dependency>
-	    
+
         <dependency>
 			<groupId>com.oracle.jdbc</groupId>
 			<artifactId>com.springsource.oracle.jdbc</artifactId>
@@ -294,7 +296,7 @@
 		    <artifactId>jackson-xc</artifactId>
 		    <version>1.6.4</version>
 		</dependency>
-		
+
 	</dependencies>
 	<build>
 	    <resources>
@@ -365,32 +367,32 @@
 		  	</executions>
 		  </plugin>
 	 	</plugins>
-	</build>	
+	</build>
     <repositories>
     	<repository>
 			<id>maven-central</id>
 			<name>Maven Central</name>
-			<url>http://repo1.maven.org/maven2</url>
+			<url>https://repo1.maven.org/maven2</url>
 		</repository>
         <repository>
             <id>spring-release</id>
             <name>Spring Portfolio Release Repository</name>
-            <url>http://s3.amazonaws.com/maven.springframework.org/release</url>
+            <url>https://repo.spring.io/release</url>
         </repository>
         <repository>
             <id>spring-milestone</id>
             <name>Spring Portfolio Milestone Repository</name>
-            <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+            <url>https://repo.spring.io/milestone</url>
         </repository>
         <repository>
             <id>spring-snapshot</id>
             <name>Spring Portfolio Snapshot Repository</name>
-            <url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
+            <url>https://repo.spring.io/snapshot</url>
         </repository>
 		<repository>
 			<id>querydsl</id>
 			<name>QueryDsl</name>
-			<url>http://source.mysema.com/maven2/releases</url>
+			<url>https://source.mysema.com/maven2/releases</url>
 		</repository>
 		<repository>
 			<id>jboss</id>

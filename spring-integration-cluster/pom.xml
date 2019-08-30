@@ -20,7 +20,7 @@
 		<com.sonic.client.version>8.0</com.sonic.client.version>
 		<org.apache.xmlbeans-version>2.4.0</org.apache.xmlbeans-version>
 		<org.apache.ant.version>1.7.1</org.apache.ant.version>
-		<spring.data.jpa.version>1.11.22.RELEASE</spring.data.jpa.version>
+		<spring.data.jpa.version>1.11.23.RELEASE</spring.data.jpa.version>
 		<spring.data.redis.version>1.8.22.RELEASE</spring.data.redis.version>
 	</properties>
 

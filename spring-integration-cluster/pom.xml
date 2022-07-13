@@ -14,7 +14,7 @@
 		<org.springframework.version>5.3.18</org.springframework.version>
 		<org.springframework.batch.version>2.0.3.RELEASE</org.springframework.batch.version>
 		<org.springframework.integration.version>2.1.0.RC1</org.springframework.integration.version>
-		<org.apache.activemq.version>5.4.1</org.apache.activemq.version>
+		<org.apache.activemq.version>5.6.0</org.apache.activemq.version>
 		<org.slf4j.version>1.5.8</org.slf4j.version>
 		<com.sonic.client.version>8.0</com.sonic.client.version>
 		<org.apache.xmlbeans-version>2.4.0</org.apache.xmlbeans-version>
